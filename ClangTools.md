@@ -36,3 +36,41 @@
 * 様々なタイプのClang Toolsがその他のリポジトリに入れられていて、これらはここで見つけられます。これらのツールのドキュメントは他のツールのデベロッパーのために作られていて、それぞれのツールがそれぞれのユーザーに焦点を当てたドキュメントを提供しています。
 
 #### clang-tidy
+* clang-tidyはclangをベースにしたC++の静的解析ツールです。バグが発生しやすいパターン、パフォーマンス、移植性、保守性を検出し改善するコンパイラをベースにした静的解析のフレームワークを提供します。
+
+### 新しいツールのアイディア
+* C++のcastを変換するツール。Cの((type) value)をC++の(static_cast,const_cast, または reinterpret_cast)に変換する。
+
+* 非メンバ関数のbegin()とend()の変換ツール。fooが通常のコンテナだった場合にfoo.begin()をbegin(foo)に変換し、end()も同様に変換する。同じように、配列に対しても似たようなパターンを検出できる。
+
+* tr1を削除するツール。TR1ライブラリを使っているソースコードをC++11ライブラリのコードに移植する。例えば、
+```
+#include <tr1/unordered_map>
+int main()
+{
+        std::tr1::unordered_map <int, int> ma;
+            std::cout << ma.size () << std::endl;
+                return 0;
+}
+```
+は以下のように書き換えられる。
+```
+#include <unordered_map>
+int main()
+{
+        std::unordered_map <int, int> ma;
+            std::cout << ma.size () << std::endl;
+                return 0;
+}
+```
+
+* autoを削除するツール。autoを明示的な型に変換するか、推論した型をコメントとして書き残す。これは、ソースコードの挙動がわからなくなるのを恐れてautoを使いたがらない開発者がいるからである。
+
+* C++14: 曖昧でないoperatorの関数オブジェクト(N3421)。例えば
+```
+sort(v.begin(), v.end(), greater<ValueType>());
+```
+は以下のように書き換えられる。
+```
+sort(v.begin(), v.end(), greater<>());
+```
